@@ -9,6 +9,14 @@ resource "aws_security_group" "jenkins_sg" {
     to_port     = 22
     protocol    = "tcp"
     ipv6_cidr_blocks = ["::/0"]
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+  ingress {
+    from_port   = 8080
+    to_port     = 8080
+    protocol    = "tcp"
+    ipv6_cidr_blocks = ["::/0"]
+    cidr_blocks = ["0.0.0.0/0"]
   }
 
   egress {
@@ -40,7 +48,7 @@ resource "aws_instance" "jenkins_ec2" {
     aws_internet_gateway.jenkins_igw
   ]
   iam_instance_profile = aws_iam_instance_profile.session_manager_instance_profile.name
-
+  associate_public_ip_address = true
   tags = {
     "Name" = "Jenkins-EC2-Instance"
   }
@@ -49,6 +57,9 @@ resource "aws_instance" "jenkins_ec2" {
 
 output "public_ipv6" {
   value = aws_instance.jenkins_ec2.ipv6_addresses[0]
+}
+output "public_ipv4" {
+  value = aws_instance.jenkins_ec2.public_ip
 }
 output "instance_id" {
   value = aws_instance.jenkins_ec2.id
